@@ -5,8 +5,10 @@
 package it.polito.tdp.crimes;
 
 import java.net.URL;
+import java.util.List;
 import java.util.ResourceBundle;
 
+import it.polito.tdp.crimes.model.Arco;
 import it.polito.tdp.crimes.model.Model;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -25,10 +27,10 @@ public class FXMLController {
     private URL location;
 
     @FXML // fx:id="boxCategoria"
-    private ComboBox<?> boxCategoria; // Value injected by FXMLLoader
+    private ComboBox<String> boxCategoria; // Value injected by FXMLLoader
 
     @FXML // fx:id="boxMese"
-    private ComboBox<?> boxMese; // Value injected by FXMLLoader
+    private ComboBox<Integer> boxMese; // Value injected by FXMLLoader
 
     @FXML // fx:id="btnAnalisi"
     private Button btnAnalisi; // Value injected by FXMLLoader
@@ -49,7 +51,26 @@ public class FXMLController {
 
     @FXML
     void doCreaGrafo(ActionEvent event) {
-
+    	txtResult.clear();
+    	String categoria = this.boxCategoria.getValue();
+    	if (categoria == null) {
+			txtResult.setText("Seleziona una categoria!");
+    		return;
+		}
+    	
+    	Integer mese = this.boxMese.getValue();
+    	if (mese == null) {
+			txtResult.setText("Seleziona un mese!");
+    		return;
+		}
+    	
+    	this.model.creaGrafo(categoria, mese);
+    	
+    	List<Arco> archi = this.model.getArchi();
+    	txtResult.appendText("ARCHI > PESO MEDIO: \n");
+    	for(Arco a: archi) {
+    		txtResult.appendText(a.toString() + "\n");
+    	}
     }
 
     @FXML // This method is called by the FXMLLoader when initialization is complete
@@ -65,5 +86,7 @@ public class FXMLController {
     
     public void setModel(Model model) {
     	this.model = model;
+    	this.boxCategoria.getItems().addAll(this.model.getCategorie());
+    	this.boxMese.getItems().addAll(this.model.getMesi());
     }
 }
