@@ -36,7 +36,7 @@ public class FXMLController {
     private Button btnAnalisi; // Value injected by FXMLLoader
 
     @FXML // fx:id="boxArco"
-    private ComboBox<?> boxArco; // Value injected by FXMLLoader
+    private ComboBox<Arco> boxArco; // Value injected by FXMLLoader
 
     @FXML // fx:id="btnPercorso"
     private Button btnPercorso; // Value injected by FXMLLoader
@@ -46,9 +46,23 @@ public class FXMLController {
 
     @FXML
     void doCalcolaPercorso(ActionEvent event) {
-
+    	this.txtResult.clear();
+    	Arco arco = this.boxArco.getValue();
+    	
+    	if(arco == null) {
+    		txtResult.setText("Seleziona un arco!");
+    		return;
+    	}
+    	
+    	List<String> percorso = this.model.trovaPercorso(arco.getV1(), arco.getV2());
+    	this.txtResult.appendText("Percorso migliore: \n\n");
+    	for(String v: percorso) {
+    		this.txtResult.appendText(v + "\n");
+    	}
+    	
     }
 
+    
     @FXML
     void doCreaGrafo(ActionEvent event) {
     	txtResult.clear();
@@ -67,12 +81,14 @@ public class FXMLController {
     	this.model.creaGrafo(categoria, mese);
     	
     	List<Arco> archi = this.model.getArchi();
+    	this.boxArco.getItems().addAll(archi);
     	txtResult.appendText("ARCHI > PESO MEDIO: \n");
     	for(Arco a: archi) {
     		txtResult.appendText(a.toString() + "\n");
     	}
     }
 
+    
     @FXML // This method is called by the FXMLLoader when initialization is complete
     void initialize() {
         assert boxCategoria != null : "fx:id=\"boxCategoria\" was not injected: check your FXML file 'Scene.fxml'.";

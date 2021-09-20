@@ -16,6 +16,7 @@ import it.polito.tdp.crimes.db.EventsDao;
 public class Model {
 	private Graph<String, DefaultWeightedEdge> grafo;
 	private EventsDao dao;
+	private List<String> best;
 	
 	public Model(){
 		dao = new EventsDao();
@@ -69,6 +70,40 @@ public class Model {
 		return archi;
 	}
 	
+	
+	
+	public List<String> trovaPercorso(String sorgente, String destinazione) {
+		List<String> parziale = new ArrayList<String>();
+		this.best = new ArrayList<String>();
+		parziale.add(sorgente);
+		trovaRicorsivo(destinazione, parziale, 0);
+		return this.best;
+	}
+
+	
+	private void trovaRicorsivo(String destinazione, List<String> parziale, int livello) {
+		// terminazione --> ultimo vertice inserito in parziale è uguale a destinazione
+		if(parziale.get(parziale.size() - 1).equals(destinazione)) {
+			if(parziale.size() > this.best.size()) {
+				this.best = new ArrayList<String>(parziale);
+			}
+			return;
+		}
+		
+		// scorro i vicini dell'ultimo vertice inserito in parziale
+		for(String vicino : Graphs.neighborListOf(this.grafo, parziale.get(parziale.size() - 1))) {
+			// cammino aciclico --> controllo se vertice già in parziale
+			if(!parziale.contains(vicino)) {
+				// prova ad aggiungere
+				parziale.add(vicino);
+				// ricorsione
+				this.trovaRicorsivo(destinazione, parziale, livello + 1);
+				// backtracking
+				parziale.remove(parziale.size() - 1);
+			}
+		}
+	}
+
 	
 	
 	
